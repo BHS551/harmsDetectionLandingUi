@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
                 },
             });
             const data = await response.json();
-            const items = data.items ? data.items.sort((a, b) => b.id.localeCompare(a.id)) : [];
+            const items = data.items ? data.items.sort((a:any, b:any) => b.id.localeCompare(a.id)) : [];
             setDetections(items);
         } catch (error) {
             console.error('Failed to fetch detections:', error);
