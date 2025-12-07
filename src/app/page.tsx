@@ -1,6 +1,5 @@
 "use client";
 import Head from 'next/head'
-import { useRef } from 'react'
 
 export default function Home() {
 

@@ -1,7 +1,6 @@
 "use client";
 
 import Head from "next/head";
-import { useRef } from "react";
 import Dashboard from "./dashboard";
 
 export default function Console() {

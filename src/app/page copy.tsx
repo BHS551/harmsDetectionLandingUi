@@ -1,6 +1,5 @@
 import { NextPage } from 'next'
 import Head from 'next/head'
-import { useRef } from 'react'
 
 const Home: NextPage = () => {
 
