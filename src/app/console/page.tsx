@@ -16,6 +16,11 @@ export default function Console() {
           <nav>
             <ul className="flex space-x-6">
               <li>
+                <a href="/console/detections" className="hover:text-orange-500">
+                  Detections
+                </a>
+              </li>
+              <li>
                 <a href="/console/cameras" className="hover:text-orange-500">
                   Camera
                 </a>

@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
                     // credentials: "include",
                 });
                 const data = await response.json();
-                setDetections(data);
+                setDetections(data.items || []);
             } catch (error) {
                 console.error('Failed to fetch detections:', error);
             } finally {
