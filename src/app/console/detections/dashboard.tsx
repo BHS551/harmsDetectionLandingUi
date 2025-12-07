@@ -72,6 +72,7 @@ const Dashboard: React.FC = () => {
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Detection</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Camera Name</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Date</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">accuracy</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,6 +88,7 @@ const Dashboard: React.FC = () => {
                                     </td>
                                     <td className="px-6 py-4 text-gray-300">{JSON.parse(detection.raw).cammera}</td>
                                     <td className="px-6 py-4 text-gray-300">{detection.id.split('.')[0]}</td>
+                                    <td className="px-6 py-4 text-gray-300">{JSON.parse(detection.raw).cosine_sim}</td>
                                 </tr>
                             ))}
                         </tbody>
