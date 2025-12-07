@@ -1,8 +1,12 @@
 import { NextPage } from 'next'
 import Head from 'next/head'
+import { useRef } from 'react'
 
 const Home: NextPage = () => {
-
+  const homeRef = useRef<HTMLDivElement>(null)
+  const aboutRef = useRef<HTMLDivElement>(null)
+  const featuresRef = useRef<HTMLDivElement>(null)
+  const contactRef = useRef<HTMLDivElement>(null)
 
   // Function to scroll smoothly to a section
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {

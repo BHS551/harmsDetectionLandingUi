@@ -5,12 +5,6 @@ import Dashboard from "./dashboard";
 
 export default function Console() {
 
-  // Función para desplazarse suavemente a una sección
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
   return (
     <>
       <Head>
