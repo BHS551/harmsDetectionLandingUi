@@ -3,10 +3,7 @@ import Head from 'next/head'
 import { useRef } from 'react'
 
 export default function Home() {
-  const homeRef = useRef<HTMLDivElement>(null)
-  const aboutRef = useRef<HTMLDivElement>(null)
-  const featuresRef = useRef<HTMLDivElement>(null)
-  const contactRef = useRef<HTMLDivElement>(null)
+
 
   // Función para desplazarse suavemente a una sección
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
@@ -54,6 +51,11 @@ export default function Home() {
                 <button onClick={() => scrollToSection(contactRef)} className="hover:text-orange-500">
                   Contáctenos
                 </button>
+              </li>
+              <li>
+                <a href="/console" className="hover:text-orange-500">
+                  Console
+                </a>
               </li>
             </ul>
           </nav>
