@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
                         <thead className="bg-slate-700 text-white">
                             <tr>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Date</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Device ID</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Raw info</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Camera Name</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold">Screenshot</th>
                             </tr>
