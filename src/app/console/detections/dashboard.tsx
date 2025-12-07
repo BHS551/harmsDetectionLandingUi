@@ -23,14 +23,15 @@ const Dashboard: React.FC = () => {
 
     const fetchDetections = async () => {
         try {
-            const response = await fetch('https://zs8vnk4zv0.execute-api.us-east-1.amazonaws.com/default/listDetections?limit=50', {
+            const response = await fetch('https://zs8vnk4zv0.execute-api.us-east-1.amazonaws.com/default/listDetections?limit=5000', {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
                 },
             });
             const data = await response.json();
-            setDetections(data.items || []);
+            const items = data.items ? data.items.sort((a, b) => b.id.localeCompare(a.id)) : [];
+            setDetections(items);
         } catch (error) {
             console.error('Failed to fetch detections:', error);
         } finally {

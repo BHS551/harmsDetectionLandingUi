@@ -20,7 +20,7 @@ export async function GET() {
     const listCommand = new ListObjectsV2Command({
       Bucket: bucket,
       Prefix: prefix,
-      MaxKeys: 100, // adjust if needed
+      MaxKeys: 5000, // adjust if needed
     });
 
     const result = await s3.send(listCommand);
