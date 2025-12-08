@@ -60,7 +60,6 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-white mb-8">Detections Dashboard</h1>
             
             {loadingDetectionInfo || loadingDetectionScreenshots ? (
                 <div className="text-center text-gray-400">Loading...</div>
