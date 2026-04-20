@@ -1,6 +1,7 @@
 "use client";
 
 import Head from "next/head";
+import { Suspense } from "react";
 import { ConsoleLogin } from "../login";
 
 export default function ConsoleLoginPage() {
@@ -13,7 +14,15 @@ export default function ConsoleLoginPage() {
           content="Acceso al panel de monitoreo de SkyEye."
         />
       </Head>
-      <ConsoleLogin />
+      <Suspense
+        fallback={
+          <main className="flex min-h-screen items-center justify-center bg-[#050505] text-gray-300">
+            Cargando acceso...
+          </main>
+        }
+      >
+        <ConsoleLogin />
+      </Suspense>
     </>
   );
 }

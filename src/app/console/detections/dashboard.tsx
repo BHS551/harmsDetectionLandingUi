@@ -7,6 +7,12 @@ interface Detection {
     raw: string;
 }
 
+type DetectionRaw = {
+  detection_id?: string;
+  cammera?: string;
+  cosine_sim?: string | number;
+};
+
 type ScreenshotItem = {
   key: string;
   size: number;
@@ -20,6 +26,7 @@ const Dashboard: React.FC = () => {
     const [loadingDetectionScreenshots, setloadingDetectionScreenshots] = React.useState(true);
     const [items, setItems] = useState<ScreenshotItem[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [screenshotsError, setScreenshotsError] = useState<string | null>(null);
 
     const fetchDetections = async () => {
         try {
@@ -42,11 +49,14 @@ const Dashboard: React.FC = () => {
     async function fetchScreenshots() {
         try {
             const res = await fetch("/api/screenshots");
-            console.log(res)
-            if (!res.ok) throw new Error("Failed to load screenshots");
             const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to load screenshots");
+            }
             setItems(data.items);
         } catch (err) {
+            const message = err instanceof Error ? err.message : "Failed to load screenshots";
+            setScreenshotsError(message);
             console.error(err);
         } finally {
             setloadingDetectionScreenshots(false);
@@ -60,6 +70,11 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
+            {screenshotsError ? (
+                <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                    Screenshots unavailable: {screenshotsError}
+                </div>
+            ) : null}
             
             {loadingDetectionInfo || loadingDetectionScreenshots ? (
                 <div className="text-center text-gray-400">Loading...</div>
@@ -75,21 +90,37 @@ const Dashboard: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {detections.map((detection) => (
-                                <tr key={detection.id} className="border-t border-slate-700 hover:bg-slate-700/50 transition">
-                                    <td className="px-6 py-4">
-                                        <img 
-                                            src={items.find(item => item.key.includes(JSON.parse(detection.raw).detection_id))?.url || ""} 
-                                            alt="Detection" 
-                                            className="h-12 rounded cursor-pointer hover:opacity-80 transition"
-                                            onClick={() => setSelectedImage(items.find(item => item.key.includes(JSON.parse(detection.raw).detection_id))?.url || null)}
-                                        />
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-300">{JSON.parse(detection.raw).cammera}</td>
-                                    <td className="px-6 py-4 text-gray-300">{detection.id.split('.')[0]}</td>
-                                    <td className="px-6 py-4 text-gray-300">{JSON.parse(detection.raw).cosine_sim}</td>
-                                </tr>
-                            ))}
+                            {detections.map((detection) => {
+                                const detectionData = JSON.parse(detection.raw) as DetectionRaw;
+                                const detectionImage =
+                                  items.find((item) =>
+                                    detectionData.detection_id
+                                      ? item.key.includes(detectionData.detection_id)
+                                      : false
+                                  )?.url ?? null;
+
+                                return (
+                                  <tr key={detection.id} className="border-t border-slate-700 hover:bg-slate-700/50 transition">
+                                      <td className="px-6 py-4">
+                                          {detectionImage ? (
+                                            <img
+                                              src={detectionImage}
+                                              alt="Detection"
+                                              className="h-12 rounded cursor-pointer hover:opacity-80 transition"
+                                              onClick={() => setSelectedImage(detectionImage)}
+                                            />
+                                          ) : (
+                                            <div className="flex h-12 w-20 items-center justify-center rounded bg-slate-800 text-xs text-gray-400">
+                                              No image
+                                            </div>
+                                          )}
+                                      </td>
+                                      <td className="px-6 py-4 text-gray-300">{detectionData.cammera || "-"}</td>
+                                      <td className="px-6 py-4 text-gray-300">{detection.id.split('.')[0]}</td>
+                                      <td className="px-6 py-4 text-gray-300">{detectionData.cosine_sim ?? "-"}</td>
+                                  </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
