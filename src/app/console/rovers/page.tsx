@@ -1,39 +1,24 @@
 "use client";
 
 import Head from "next/head";
+import { ConsoleProtectedPage } from "../login";
 
 export default function Console() {
-
   return (
     <>
       <Head>
         <title>SkyEye - Monitoreo de Seguridad Impulsado por IA</title>
         <meta name="description" content="Revolucionando la vigilancia con detección inteligente de amenazas." />
       </Head>
-      <header className="sticky top-0 z-50 bg-black opacity-90">
-        <div className="container mx-auto flex items-center justify-between px-4 py-6">
-          <div className="text-2xl font-bold">SkyEye - Console / Rovers</div>
-          <nav>
-            <ul className="flex space-x-6">
-              <li>
-                <a href="/console/detections" className="hover:text-orange-500">
-                  Detections
-                </a>
-              </li>
-              <li>
-                <a href="/console/cameras" className="hover:text-orange-500">
-                  Camera
-                </a>
-              </li>
-              <li>
-                <a href="/console/rovers" className="hover:text-orange-500">
-                  Rovers
-                </a>
-              </li>
-            </ul>
-          </nav>
+      <ConsoleProtectedPage
+        title="Rovers"
+        subtitle="Módulo reservado para operaciones y automatizaciones terrestres."
+      >
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-gray-300">
+          El panel de rovers todavía está en construcción, pero ahora queda
+          protegido por el mismo acceso de la consola.
         </div>
-      </header>
+      </ConsoleProtectedPage>
     </>
   )
 }

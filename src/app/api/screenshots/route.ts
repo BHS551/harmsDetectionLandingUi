@@ -14,8 +14,18 @@ const s3 = new S3Client({
 
 export async function GET() {
   try {
-    const bucket = process.env.S3_BUCKET_NAME!;
+    const bucket = process.env.S3_BUCKET_NAME;
     const prefix = process.env.S3_PREFIX || ""; // "cameras/"
+
+    if (!process.env.AWS_REGION || !bucket) {
+      return NextResponse.json(
+        {
+          items: [],
+          error: "Missing AWS configuration. Check AWS_REGION and S3_BUCKET_NAME.",
+        },
+        { status: 500 }
+      );
+    }
 
     const listCommand = new ListObjectsV2Command({
       Bucket: bucket,
@@ -56,6 +66,12 @@ export async function GET() {
     return NextResponse.json({ items: filtered });
   } catch (err) {
     console.error("Error listing S3 objects:", err);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return NextResponse.json(
+      {
+        items: [],
+        error: "Failed to load screenshots from S3.",
+      },
+      { status: 500 }
+    );
   }
 }
