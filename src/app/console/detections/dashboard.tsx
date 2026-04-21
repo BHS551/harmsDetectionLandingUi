@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { auth } from "@/lib/firebase";
 
 interface Detection {
     id: string;
@@ -27,19 +28,39 @@ const Dashboard: React.FC = () => {
     const [items, setItems] = useState<ScreenshotItem[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [screenshotsError, setScreenshotsError] = useState<string | null>(null);
+    const [detectionsError, setDetectionsError] = useState<string | null>(null);
 
     const fetchDetections = async () => {
         try {
-            const response = await fetch('https://zs8vnk4zv0.execute-api.us-east-1.amazonaws.com/default/listDetections?limit=5000', {
+            const user = auth?.currentUser;
+
+            if (!user) {
+                throw new Error("No authenticated user");
+            }
+
+            const token = await user.getIdToken();
+            const response = await fetch(' https://xs7uvyebj5.execute-api.us-east-1.amazonaws.com/default/listDetections', {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
             });
+
+            if (response.status === 401) {
+                throw new Error("Unauthorized");
+            }
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch detections");
+            }
+
             const data = await response.json();
             const items = data.items ? data.items.sort((a:any, b:any) => b.id.localeCompare(a.id)) : [];
             setDetections(items);
         } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to fetch detections';
+            setDetectionsError(message);
             console.error('Failed to fetch detections:', error);
         } finally {
             setloadingDetectionInfo(false);
@@ -70,6 +91,12 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
+            {detectionsError ? (
+                <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                    Detections unavailable: {detectionsError}
+                </div>
+            ) : null}
+
             {screenshotsError ? (
                 <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
                     Screenshots unavailable: {screenshotsError}
