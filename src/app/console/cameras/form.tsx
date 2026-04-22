@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { auth } from "@/lib/firebase";
 
 
 interface FormData {
@@ -29,12 +30,27 @@ export default function CameraForm() {
         setMessage('');
 
         try {
+            const user = auth?.currentUser;
+
+            if (!user) {
+                throw new Error("No authenticated user");
+            }
+
+            const token = await user.getIdToken();
             console.log('Submitting form data:', formData);
             const response = await fetch('https://dakl314nma.execute-api.us-east-1.amazonaws.com/default/storeDevice', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify(formData),
             });
+
+            if (response.status === 401) {
+                setMessage('Unauthorized. Please sign in again.');
+                return;
+            }
 
             if (response.ok) {
                 setMessage('Device added successfully!');
@@ -43,7 +59,7 @@ export default function CameraForm() {
                 setMessage('Failed to add device. Please try again.');
             }
         } catch (error) {
-            setMessage('An error occurred. Please try again.');
+            setMessage(error instanceof Error ? error.message : 'An error occurred. Please try again.');
         } finally {
             setLoading(false);
         }
