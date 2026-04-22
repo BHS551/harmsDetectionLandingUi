@@ -29,7 +29,7 @@ const Dashboard: React.FC = () => {
             }
 
             const token = await user.getIdToken();
-            const response = await fetch('https://wex0c6038j.execute-api.us-east-1.amazonaws.com/default/listDevices?limit=5000', {
+            const response = await fetch('https://wex0c6038j.execute-api.us-east-1.amazonaws.com/default/listDevices', {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
