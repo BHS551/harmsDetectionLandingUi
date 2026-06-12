@@ -65,11 +65,12 @@ export async function GET() {
 
     return NextResponse.json({ items: filtered });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error("Error listing S3 objects:", err);
     return NextResponse.json(
       {
         items: [],
-        error: "Failed to load screenshots from S3.",
+        error: message,
       },
       { status: 500 }
     );
