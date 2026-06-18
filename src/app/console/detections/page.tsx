@@ -15,7 +15,10 @@ export default function Console() {
         title="Detections"
         subtitle="Monitorea los eventos detectados por la plataforma."
       >
-        <Dashboard />
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-white">Lista de detecciones</h2>
+          <Dashboard />
+        </div>
       </ConsoleProtectedPage>
     </>
   )

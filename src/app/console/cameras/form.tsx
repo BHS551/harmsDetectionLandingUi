@@ -10,7 +10,7 @@ interface FormData {
     client_id: string;
 }
 
-export default function CameraForm() {
+export default function CameraForm({ onSuccess }: { onSuccess?: () => void }) {
     const [formData, setFormData] = useState<FormData>({
         rtsp_path: '',
         name: '',
@@ -55,6 +55,7 @@ export default function CameraForm() {
             if (response.ok) {
                 setMessage('Device added successfully!');
                 setFormData({ rtsp_path: '', name: '', client_id: '' });
+                onSuccess?.();
             } else {
                 setMessage('Failed to add device. Please try again.');
             }
@@ -66,17 +67,14 @@ export default function CameraForm() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+        <div className="border-t border-slate-700 pt-8">
+            <h2 className="text-lg font-semibold text-white mb-4 text-center">Add Camera Device</h2>
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-md bg-white rounded-lg shadow-2xl p-8 space-y-6"
+                className="max-w-xl mx-auto bg-slate-800 rounded-lg p-6 space-y-4"
             >
-                <h1 className="text-3xl font-bold text-slate-800 text-center">
-                    Add Camera Device
-                </h1>
-
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm text-gray-400 mb-1">
                         Device Name
                     </label>
                     <input
@@ -86,12 +84,12 @@ export default function CameraForm() {
                         onChange={handleChange}
                         placeholder="Enter device name"
                         required
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full px-4 py-2 rounded-lg bg-black/40 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm text-gray-400 mb-1">
                         RTSP Path
                     </label>
                     <input
@@ -101,12 +99,12 @@ export default function CameraForm() {
                         onChange={handleChange}
                         placeholder="rtsp://..."
                         required
-                        className="w-full px-4 py-2 border border-slate-300 text-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full px-4 py-2 rounded-lg bg-black/40 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm text-gray-400 mb-1">
                         Client ID
                     </label>
                     <input
@@ -116,26 +114,22 @@ export default function CameraForm() {
                         onChange={handleChange}
                         placeholder="Enter client ID"
                         required
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full px-4 py-2 rounded-lg bg-black/40 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white font-semibold py-2 rounded-lg transition duration-200"
+                    className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold py-2 rounded-lg transition"
                 >
                     {loading ? 'Adding Device...' : 'Add Device'}
                 </button>
 
                 {message && (
-                    <p
-                        className={`text-center text-sm font-medium ${
-                            message.includes('successfully')
-                                ? 'text-green-600'
-                                : 'text-red-600'
-                        }`}
-                    >
+                    <p className={`text-sm font-medium ${
+                        message.includes('successfully') ? 'text-green-400' : 'text-red-400'
+                    }`}>
                         {message}
                     </p>
                 )}

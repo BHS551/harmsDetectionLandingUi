@@ -93,7 +93,7 @@ export function ConsoleHeader({
     <header className="sticky top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-orange-400">
+          <p className="text-xs uppercase tracking-[0.3em] text-blue-400">
             SkyEye Console
           </p>
           <h1 className="text-2xl font-semibold text-white">{title}</h1>
@@ -114,8 +114,8 @@ export function ConsoleHeader({
                       href={item.href}
                       className={`rounded-full border px-4 py-2 transition ${
                         isActive
-                          ? "border-orange-500 bg-orange-500/10 text-orange-300"
-                          : "border-white/10 hover:border-orange-500/60 hover:text-orange-300"
+                          ? "border-blue-500 bg-blue-500/10 text-blue-300"
+                          : "border-white/10 hover:border-blue-500/60 hover:text-blue-300"
                       }`}
                     >
                       {item.label}
@@ -328,7 +328,7 @@ export function ConsoleLogin() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1f1f1f_0%,#050505_55%)] px-4 py-12 text-white">
       <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="space-y-6">
-          <div className="inline-flex rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm text-orange-300">
+          <div className="inline-flex rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
             Acceso al panel operativo
           </div>
           <div className="space-y-4">
@@ -359,7 +359,7 @@ export function ConsoleLogin() {
 
         <section className="rounded-3xl border border-white/10 bg-white/6 p-8 shadow-2xl shadow-black/40 backdrop-blur">
           <div className="mb-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-400">
+            <p className="text-sm uppercase tracking-[0.3em] text-blue-400">
               Login
             </p>
             <h2 className="mt-2 text-2xl font-semibold">
@@ -382,7 +382,7 @@ export function ConsoleLogin() {
               }}
               className={`rounded-xl px-4 py-3 text-sm font-semibold transition ${
                 mode === "login"
-                  ? "bg-orange-500 text-black"
+                  ? "bg-blue-500 text-black"
                   : "text-gray-300 hover:bg-white/5"
               }`}
             >
@@ -397,7 +397,7 @@ export function ConsoleLogin() {
               }}
               className={`rounded-xl px-4 py-3 text-sm font-semibold transition ${
                 mode === "register"
-                  ? "bg-orange-500 text-black"
+                  ? "bg-blue-500 text-black"
                   : "text-gray-300 hover:bg-white/5"
               }`}
             >
@@ -424,7 +424,7 @@ export function ConsoleLogin() {
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-orange-500"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-blue-500"
                 placeholder="admin@correo.com"
                 required
               />
@@ -438,7 +438,7 @@ export function ConsoleLogin() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-orange-500"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-blue-500"
                 placeholder="Tu contrasena"
                 required
               />
@@ -447,7 +447,7 @@ export function ConsoleLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-2xl bg-orange-500 px-4 py-3 font-semibold text-black transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-black transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading
                 ? mode === "login"
@@ -462,7 +462,7 @@ export function ConsoleLogin() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-semibold text-white transition hover:border-orange-500/60 hover:text-orange-200 disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-semibold text-white transition hover:border-blue-500/60 hover:text-blue-200 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? "Procesando..." : "Continuar con Google"}
             </button>

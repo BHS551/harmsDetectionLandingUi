@@ -51,9 +51,9 @@ export default function Console() {
             <div className="grid gap-4 md:grid-cols-3">
               <a
                 href="/console/detections"
-                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-orange-500/50 hover:bg-white/8"
+                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-blue-500/50 hover:bg-white/8"
               >
-                <p className="text-sm text-orange-300">01</p>
+                <p className="text-sm text-blue-300">01</p>
                 <h2 className="mt-3 text-xl font-semibold">Detections</h2>
                 <p className="mt-2 text-sm text-gray-300">
                   Revisa eventos detectados y el comportamiento del sistema.
@@ -62,9 +62,9 @@ export default function Console() {
 
               <a
                 href="/console/cameras"
-                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-orange-500/50 hover:bg-white/8"
+                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-blue-500/50 hover:bg-white/8"
               >
-                <p className="text-sm text-orange-300">02</p>
+                <p className="text-sm text-blue-300">02</p>
                 <h2 className="mt-3 text-xl font-semibold">Cameras</h2>
                 <p className="mt-2 text-sm text-gray-300">
                   Administra fuentes de video y registra nuevas cámaras.
@@ -73,9 +73,9 @@ export default function Console() {
 
               <a
                 href="/console/rovers"
-                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-orange-500/50 hover:bg-white/8"
+                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-blue-500/50 hover:bg-white/8"
               >
-                <p className="text-sm text-orange-300">03</p>
+                <p className="text-sm text-blue-300">03</p>
                 <h2 className="mt-3 text-xl font-semibold">Rovers</h2>
                 <p className="mt-2 text-sm text-gray-300">
                   Consulta el módulo reservado para operación remota.
