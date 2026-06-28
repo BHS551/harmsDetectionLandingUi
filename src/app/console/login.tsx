@@ -16,33 +16,33 @@ import { auth, isFirebaseConfigured } from "@/lib/firebase";
 
 const navigationItems = [
   { href: "/console", label: "Inicio" },
-  { href: "/console/detections", label: "Detections" },
-  { href: "/console/cameras", label: "Cameras" },
+  { href: "/console/detections", label: "Detecciones" },
+  { href: "/console/cameras", label: "Cámaras" },
   { href: "/console/rovers", label: "Rovers" },
 ];
 
 function getFirebaseMessage(code?: string) {
   switch (code) {
     case "auth/invalid-email":
-      return "El correo no es valido.";
+      return "El correo no es válido.";
     case "auth/user-not-found":
     case "auth/wrong-password":
     case "auth/invalid-credential":
-      return "Correo o contrasena incorrectos.";
+      return "Correo o contraseña incorrectos.";
     case "auth/too-many-requests":
       return "Demasiados intentos. Intenta otra vez en unos minutos.";
     case "auth/email-already-in-use":
-      return "Ese correo ya esta registrado.";
+      return "Ese correo ya está registrado.";
     case "auth/weak-password":
-      return "La contrasena debe tener al menos 6 caracteres.";
+      return "La contraseña debe tener al menos 6 caracteres.";
     case "auth/popup-closed-by-user":
       return "Cerraste la ventana de Google antes de completar el acceso.";
     case "auth/popup-blocked":
-      return "El navegador bloqueo la ventana emergente de Google.";
+      return "El navegador bloqueó la ventana emergente de Google.";
     case "auth/unauthorized-domain":
-      return "Este dominio no esta autorizado en Firebase.";
+      return "Este dominio no está autorizado.";
     default:
-      return "No se pudo iniciar sesion con Firebase.";
+      return "No se pudo iniciar sesión. Inténtalo de nuevo.";
   }
 }
 
@@ -128,13 +128,13 @@ export function ConsoleHeader({
 
           {userLabel ? (
             <div className="flex items-center gap-3 text-sm text-gray-300">
-              <span>Sesion: {userLabel}</span>
+              <span>Sesión: {userLabel}</span>
               <button
                 type="button"
                 onClick={handleLogout}
                 className="rounded-full border border-white/10 px-4 py-2 text-white transition hover:border-red-500/60 hover:text-red-300"
               >
-                Cerrar sesion
+                Cerrar sesión
               </button>
             </div>
           ) : null}
@@ -183,7 +183,7 @@ export function ConsoleProtectedPage({
   if (!isReady) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#050505] text-gray-300">
-        Validando sesion...
+        Validando sesión...
       </main>
     );
   }
@@ -223,7 +223,7 @@ export function ConsoleLogin() {
   useEffect(() => {
     if (!auth) {
       setCheckingSession(false);
-      setError("Firebase no esta configurado en este proyecto.");
+      setError("El acceso no está disponible en este momento. Inténtalo más tarde.");
       setMessage("");
       return;
     }
@@ -251,7 +251,7 @@ export function ConsoleLogin() {
     }
 
     if (!isFirebaseConfigured || !auth) {
-      setError("Firebase no esta configurado en este proyecto.");
+      setError("El acceso no está disponible en este momento. Inténtalo más tarde.");
       setMessage("");
       return;
     }
@@ -285,7 +285,7 @@ export function ConsoleLogin() {
 
   const handleGoogleLogin = async () => {
     if (!isFirebaseConfigured || !auth) {
-      setError("Firebase no esta configurado en este proyecto.");
+      setError("El acceso no está disponible en este momento. Inténtalo más tarde.");
       setMessage("");
       return;
     }
@@ -333,26 +333,26 @@ export function ConsoleLogin() {
           </div>
           <div className="space-y-4">
             <h1 className="max-w-xl text-4xl font-semibold leading-tight md:text-5xl">
-              Inicia sesion para entrar al centro de monitoreo de SkyEye
+              Inicia sesión para entrar al centro de monitoreo de SkyEye
             </h1>
             <p className="max-w-2xl text-lg text-gray-300">
-              Este acceso ahora usa el mismo proyecto Firebase que ya tenias
-              configurado. Inicia con un usuario real de Firebase Auth.
+              Desde aquí gestionas tus cámaras, revisas las detecciones y
+              controlas el monitoreo en tiempo real.
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm text-gray-400">Proveedor</p>
-              <p className="mt-2 text-xl font-semibold">Firebase Auth</p>
+              <p className="text-sm text-gray-400">Detecciones</p>
+              <p className="mt-2 text-xl font-semibold">En tiempo real</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm text-gray-400">Cobertura</p>
-              <p className="mt-2 text-xl font-semibold">Toda /console</p>
+              <p className="text-sm text-gray-400">Cámaras</p>
+              <p className="mt-2 text-xl font-semibold">Todas tus fuentes</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm text-gray-400">Proyecto</p>
-              <p className="mt-2 text-xl font-semibold">login-69a8a</p>
+              <p className="text-sm text-gray-400">Acceso</p>
+              <p className="mt-2 text-xl font-semibold">Seguro</p>
             </div>
           </div>
         </section>
@@ -363,12 +363,12 @@ export function ConsoleLogin() {
               Login
             </p>
             <h2 className="mt-2 text-2xl font-semibold">
-              {mode === "login" ? "Iniciar sesion" : "Registrarse"}
+              {mode === "login" ? "Iniciar sesión" : "Registrarse"}
             </h2>
             <p className="mt-2 text-sm text-gray-400">
               {mode === "login"
-                ? "Ingresa con tu correo y contrasena o continua con Google."
-                : "Crea tu cuenta con correo y contrasena o usa Google."}
+                ? "Ingresa con tu correo y contraseña o continúa con Google."
+                : "Crea tu cuenta con correo y contraseña o usa Google."}
             </p>
           </div>
 
@@ -386,7 +386,7 @@ export function ConsoleLogin() {
                   : "text-gray-300 hover:bg-white/5"
               }`}
             >
-              Iniciar sesion
+              Iniciar sesión
             </button>
             <button
               type="button"
@@ -432,14 +432,14 @@ export function ConsoleLogin() {
 
             <label className="block">
               <span className="mb-2 block text-sm text-gray-300">
-                Contrasena
+                Contraseña
               </span>
               <input
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-                placeholder="Tu contrasena"
+                placeholder="Tu contraseña"
                 required
               />
             </label>
@@ -470,8 +470,8 @@ export function ConsoleLogin() {
 
           <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-gray-300">
             <p>
-              Puedes iniciar sesion, registrarte con correo y contrasena, o
-              continuar con Google usando el mismo Firebase.
+              ¿Aún no tienes cuenta? Regístrate con tu correo y contraseña, o
+              continúa con Google para acceder al panel.
             </p>
           </div>
         </section>

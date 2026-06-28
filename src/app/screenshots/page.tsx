@@ -10,6 +10,13 @@ type ScreenshotItem = {
   url: string;
 };
 
+function formatBytes(bytes: number) {
+  if (!bytes) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+}
+
 export default function ScreenshotsPage() {
   const [items, setItems] = useState<ScreenshotItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +25,6 @@ export default function ScreenshotsPage() {
     async function fetchScreenshots() {
       try {
         const res = await fetch("/api/screenshots");
-        console.log(res)
         if (!res.ok) throw new Error("Failed to load screenshots");
         const data = await res.json();
         setItems(data.items);
@@ -32,57 +38,50 @@ export default function ScreenshotsPage() {
     fetchScreenshots();
   }, []);
 
-  if (loading) return <div>Loading screenshots...</div>;
-
   return (
-    <div style={{ padding: 20 }}>
-      <h1>S3 Knife Detections</h1>
-      {items.length === 0 && <p>No screenshots found.</p>}
+    <main className="min-h-screen bg-[#050505] text-white">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <h1 className="text-2xl font-semibold">Capturas de detecciones</h1>
+        <p className="mt-1 text-sm text-gray-400">
+          Imágenes capturadas por el sistema de detección.
+        </p>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          gap: 16,
-        }}
-      >
-        {items.map((item) => (
-          <div
-            key={item.key}
-            style={{
-              border: "1px solid #444",
-              borderRadius: 8,
-              padding: 8,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                wordBreak: "break-all",
-                marginBottom: 8,
-              }}
-            >
-              {item.key}
-            </div>
-            {/* if the bucket/object is public-readable, this will show the image */}
-            <img
-              src={item.url}
-              alt={item.key}
-              style={{ width: "100%", height: "auto" }}
-            />
-            <div style={{ fontSize: 12, marginTop: 4 }}>
-              <div>Size: {item.size} bytes</div>
-              <div>
-                Last modified:{" "}
-                {item.lastModified
-                  ? new Date(item.lastModified).toLocaleString()
-                  : "Unknown"}
-              </div>
-            </div>
+        {loading ? (
+          <div className="py-12 text-center text-gray-400">
+            Cargando capturas...
           </div>
-        ))}
+        ) : items.length === 0 ? (
+          <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 px-6 py-12 text-center text-gray-400">
+            No hay capturas disponibles.
+          </div>
+        ) : (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {items.map((item) => (
+              <div
+                key={item.key}
+                className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+              >
+                <img
+                  src={item.url}
+                  alt={item.key}
+                  className="aspect-video w-full object-cover"
+                />
+                <div className="p-4">
+                  <p className="break-all text-xs text-gray-400">{item.key}</p>
+                  <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                    <span>{formatBytes(item.size)}</span>
+                    <span>
+                      {item.lastModified
+                        ? new Date(item.lastModified).toLocaleString("es-CO")
+                        : "Desconocido"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 }
