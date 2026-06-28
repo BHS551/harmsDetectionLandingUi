@@ -19,6 +19,7 @@ const navigationItems = [
   { href: "/console/detections", label: "Detecciones" },
   { href: "/console/cameras", label: "Cámaras" },
   { href: "/console/rovers", label: "Rovers" },
+  { href: "/console/billing", label: "Planes" },
 ];
 
 function getFirebaseMessage(code?: string) {

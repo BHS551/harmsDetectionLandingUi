@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para SkyEye.
+// La colección `subscriptions` la ESCRIBE únicamente el backend (webhook de
+// Stripe) usando el Admin SDK, que se salta estas reglas. El cliente solo puede
+// LEER su propia suscripción; nunca escribirla (así nadie se auto-asigna plan).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /subscriptions/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Por defecto, todo lo demás queda denegado.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

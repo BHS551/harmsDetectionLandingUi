@@ -48,13 +48,13 @@ export default function Console() {
             subtitle="Acceso interno a detecciones, cámaras y rovers."
           />
           <section className="mx-auto max-w-6xl px-4 py-8">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <a
                 href="/console/detections"
                 className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-blue-500/50 hover:bg-white/8"
               >
                 <p className="text-sm text-blue-300">01</p>
-                <h2 className="mt-3 text-xl font-semibold">Detections</h2>
+                <h2 className="mt-3 text-xl font-semibold">Detecciones</h2>
                 <p className="mt-2 text-sm text-gray-300">
                   Revisa eventos detectados y el comportamiento del sistema.
                 </p>
@@ -65,7 +65,7 @@ export default function Console() {
                 className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-blue-500/50 hover:bg-white/8"
               >
                 <p className="text-sm text-blue-300">02</p>
-                <h2 className="mt-3 text-xl font-semibold">Cameras</h2>
+                <h2 className="mt-3 text-xl font-semibold">Cámaras</h2>
                 <p className="mt-2 text-sm text-gray-300">
                   Administra fuentes de video y registra nuevas cámaras.
                 </p>
@@ -79,6 +79,17 @@ export default function Console() {
                 <h2 className="mt-3 text-xl font-semibold">Rovers</h2>
                 <p className="mt-2 text-sm text-gray-300">
                   Consulta el módulo reservado para operación remota.
+                </p>
+              </a>
+
+              <a
+                href="/console/billing"
+                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-blue-500/50 hover:bg-white/8"
+              >
+                <p className="text-sm text-blue-300">04</p>
+                <h2 className="mt-3 text-xl font-semibold">Planes</h2>
+                <p className="mt-2 text-sm text-gray-300">
+                  Gestiona tu suscripción y el cupo de cámaras de tu plan.
                 </p>
               </a>
             </div>
