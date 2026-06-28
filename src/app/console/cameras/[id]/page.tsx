@@ -158,6 +158,9 @@ export default function DeviceDetailPage() {
 
             {device && (() => {
                 const deviceData = JSON.parse(device.raw) as DeviceRaw;
+                // El switch queda bloqueado mientras hay una petición pendiente
+                // (cambiar el monitoreo, verificar el rol o cargar el plan).
+                const switchPending = switchLoading || checkingAdmin || planLoading;
                 return (
                     <div className="max-w-xl rounded-3xl border border-white/10 bg-white/5 p-6 space-y-6">
                         <div className="space-y-3">
@@ -195,24 +198,33 @@ export default function DeviceDetailPage() {
                                     {monitoring ? "Activo — la cámara está siendo monitoreada" : "Inactivo — haz clic para iniciar el monitoreo"}
                                 </p>
                             </div>
-                            <button
-                                onClick={handleToggleMonitoring}
-                                disabled={switchLoading || checkingAdmin || planLoading || (!isAdmin && !monitoring && !hasActivePlan)}
-                                title={
-                                    !isAdmin && !monitoring && !hasActivePlan
-                                        ? "Necesitas un plan activo"
-                                        : undefined
-                                }
-                                className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                                    monitoring ? "bg-blue-500" : "bg-white/15"
-                                } ${switchLoading || checkingAdmin || planLoading || (!isAdmin && !monitoring && !hasActivePlan) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                            >
-                                <span
-                                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                                        monitoring ? "translate-x-8" : "translate-x-1"
-                                    }`}
-                                />
-                            </button>
+                            <div className="flex items-center gap-3">
+                                {switchPending && (
+                                    <span
+                                        role="status"
+                                        aria-label="Procesando..."
+                                        className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-blue-400"
+                                    />
+                                )}
+                                <button
+                                    onClick={handleToggleMonitoring}
+                                    disabled={switchPending || (!isAdmin && !monitoring && !hasActivePlan)}
+                                    title={
+                                        !isAdmin && !monitoring && !hasActivePlan
+                                            ? "Necesitas un plan activo"
+                                            : undefined
+                                    }
+                                    className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                                        monitoring ? "bg-blue-500" : "bg-white/15"
+                                    } ${switchPending || (!isAdmin && !monitoring && !hasActivePlan) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                                >
+                                    <span
+                                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300 ${
+                                            monitoring ? "translate-x-8" : "translate-x-1"
+                                        }`}
+                                    />
+                                </button>
+                            </div>
                         </div>
 
                         {switchMessage && (
