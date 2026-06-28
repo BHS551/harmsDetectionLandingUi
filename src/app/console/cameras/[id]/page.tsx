@@ -49,14 +49,14 @@ export default function DeviceDetailPage() {
                     },
                 });
 
-                if (!response.ok) throw new Error("Failed to fetch devices");
+                if (!response.ok) throw new Error("No se pudieron cargar las cámaras");
 
                 const data = await response.json();
                 const found = data.items?.find((d: Device) => d.id === id);
-                if (!found) throw new Error("Device not found");
+                if (!found) throw new Error("Cámara no encontrada");
                 setDevice(found);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Error loading device");
+                setError(err instanceof Error ? err.message : "Error al cargar la cámara");
             } finally {
                 setLoading(false);
             }
@@ -105,14 +105,14 @@ export default function DeviceDetailPage() {
                 }
                 setMonitoring(true);
                 localStorage.setItem(`monitoring_${device.id}`, "true");
-                setSwitchMessage("Monitoring started successfully");
+                setSwitchMessage("Monitoreo iniciado correctamente");
             } else {
                 setMonitoring(false);
                 localStorage.removeItem(`monitoring_${device.id}`);
-                setSwitchMessage("Monitoring stopped");
+                setSwitchMessage("Monitoreo detenido");
             }
         } catch (err) {
-            setSwitchMessage(err instanceof Error ? err.message : "Error toggling monitoring");
+            setSwitchMessage(err instanceof Error ? err.message : "No se pudo cambiar el monitoreo");
         } finally {
             setSwitchLoading(false);
         }
@@ -120,17 +120,17 @@ export default function DeviceDetailPage() {
 
     return (
         <ConsoleProtectedPage
-            title="Device Detail"
-            subtitle="Manage monitoring for this camera."
+            title="Detalle de la cámara"
+            subtitle="Gestiona el monitoreo de esta cámara."
         >
             <button
                 onClick={() => router.back()}
                 className="mb-6 text-sm text-gray-400 hover:text-white transition"
             >
-                ← Back to cameras
+                ← Volver a cámaras
             </button>
 
-            {loading && <div className="text-center text-gray-400">Loading...</div>}
+            {loading && <div className="text-center text-gray-400">Cargando...</div>}
 
             {error && (
                 <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
@@ -141,38 +141,38 @@ export default function DeviceDetailPage() {
             {device && (() => {
                 const deviceData = JSON.parse(device.raw) as DeviceRaw;
                 return (
-                    <div className="max-w-xl bg-slate-800 rounded-lg p-6 space-y-6">
+                    <div className="max-w-xl rounded-3xl border border-white/10 bg-white/5 p-6 space-y-6">
                         <div className="space-y-3">
                             <div>
-                                <span className="text-gray-400 text-sm">Name</span>
+                                <span className="text-gray-400 text-sm">Nombre</span>
                                 <p className="text-white font-semibold">{deviceData.name || "-"}</p>
                             </div>
                             <div>
-                                <span className="text-gray-400 text-sm">Client ID</span>
+                                <span className="text-gray-400 text-sm">ID del cliente</span>
                                 <p className="text-white font-semibold">{deviceData.client_id || "-"}</p>
                             </div>
                             <div>
-                                <span className="text-gray-400 text-sm">RTSP Path</span>
+                                <span className="text-gray-400 text-sm">Ruta RTSP</span>
                                 <p className="text-white font-semibold break-all">{deviceData.rtsp_path || "-"}</p>
                             </div>
                             <div>
-                                <span className="text-gray-400 text-sm">Created At</span>
+                                <span className="text-gray-400 text-sm">Fecha de registro</span>
                                 <p className="text-white font-semibold">{device.created_at}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between border-t border-slate-700 pt-4">
+                        <div className="flex items-center justify-between border-t border-white/10 pt-4">
                             <div>
-                                <p className="text-white font-semibold">Monitoring</p>
+                                <p className="text-white font-semibold">Monitoreo</p>
                                 <p className="text-gray-400 text-sm">
-                                    {monitoring ? "Active — camera is being monitored" : "Inactive — click to start monitoring"}
+                                    {monitoring ? "Activo — la cámara está siendo monitoreada" : "Inactivo — haz clic para iniciar el monitoreo"}
                                 </p>
                             </div>
                             <button
                                 onClick={handleToggleMonitoring}
                                 disabled={switchLoading}
                                 className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                                    monitoring ? "bg-blue-500" : "bg-slate-600"
+                                    monitoring ? "bg-blue-500" : "bg-white/15"
                                 } ${switchLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                             >
                                 <span
@@ -185,7 +185,7 @@ export default function DeviceDetailPage() {
 
                         {switchMessage && (
                             <p className={`text-sm font-medium ${
-                                switchMessage.includes("successfully") || switchMessage.includes("stopped")
+                                switchMessage.includes("correctamente") || switchMessage.includes("detenido")
                                     ? "text-green-400"
                                     : "text-red-400"
                             }`}>

@@ -56,22 +56,26 @@ const Dashboard: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto">
             {devicesError && (
-                <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                    Devices unavailable: {devicesError}
+                <div className="mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                    No se pudieron cargar las cámaras: {devicesError}
                 </div>
             )}
 
             {loadingDeviceInfo ? (
-                <div className="text-center text-black">Loading...</div>
+                <div className="text-center text-gray-400 py-8">Cargando...</div>
+            ) : devices.length === 0 ? (
+                <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-12 text-center text-gray-400">
+                    Aún no tienes cámaras registradas. Agrega tu primera cámara para comenzar.
+                </div>
             ) : (
-                <div className="overflow-x-auto rounded-lg border border-slate-700">
+                <div className="overflow-x-auto rounded-3xl border border-white/10">
                     <table className="w-full">
-                        <thead className="bg-slate-700 text-white">
+                        <thead className="bg-white/5 text-white">
                             <tr>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Id</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Name</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Client Id</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Created At</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">ID</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Nombre</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">ID del cliente</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Fecha de registro</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,7 +84,7 @@ const Dashboard: React.FC = () => {
                                 return (
                                     <tr
                                         key={device.id}
-                                        className="border-t border-slate-700 hover:bg-slate-700/50 transition cursor-pointer"
+                                        className="border-t border-white/10 hover:bg-white/5 transition cursor-pointer"
                                         onClick={() => router.push(`/console/cameras/${device.id}`)}
                                     >
                                         <td className="px-6 py-4 text-gray-300">{device.id}</td>

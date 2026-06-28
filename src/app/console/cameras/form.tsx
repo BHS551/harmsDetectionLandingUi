@@ -37,7 +37,6 @@ export default function CameraForm({ onSuccess }: { onSuccess?: () => void }) {
             }
 
             const token = await user.getIdToken();
-            console.log('Submitting form data:', formData);
             const response = await fetch('https://dakl314nma.execute-api.us-east-1.amazonaws.com/default/storeDevice', {
                 method: 'POST',
                 headers: {
@@ -48,49 +47,49 @@ export default function CameraForm({ onSuccess }: { onSuccess?: () => void }) {
             });
 
             if (response.status === 401) {
-                setMessage('Unauthorized. Please sign in again.');
+                setMessage('Tu sesión expiró. Vuelve a iniciar sesión.');
                 return;
             }
 
             if (response.ok) {
-                setMessage('Device added successfully!');
+                setMessage('¡Cámara agregada correctamente!');
                 setFormData({ rtsp_path: '', name: '', client_id: '' });
                 onSuccess?.();
             } else {
-                setMessage('Failed to add device. Please try again.');
+                setMessage('No se pudo agregar la cámara. Inténtalo de nuevo.');
             }
         } catch (error) {
-            setMessage(error instanceof Error ? error.message : 'An error occurred. Please try again.');
+            setMessage(error instanceof Error ? error.message : 'Ocurrió un error. Inténtalo de nuevo.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="border-t border-slate-700 pt-8">
-            <h2 className="text-lg font-semibold text-white mb-4 text-center">Add Camera Device</h2>
+        <div className="border-t border-white/10 pt-8">
+            <h2 className="text-lg font-semibold text-white mb-4 text-center">Agregar cámara</h2>
             <form
                 onSubmit={handleSubmit}
-                className="max-w-xl mx-auto bg-slate-800 rounded-lg p-6 space-y-4"
+                className="max-w-xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-6 space-y-4"
             >
                 <div>
                     <label className="block text-sm text-gray-400 mb-1">
-                        Device Name
+                        Nombre de la cámara
                     </label>
                     <input
                         type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="Enter device name"
+                        placeholder="Ej: Entrada principal"
                         required
-                        className="w-full px-4 py-2 rounded-lg bg-black/40 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
+                        className="w-full px-4 py-2 rounded-2xl bg-black/40 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
                 <div>
                     <label className="block text-sm text-gray-400 mb-1">
-                        RTSP Path
+                        Ruta RTSP
                     </label>
                     <input
                         type="text"
@@ -99,36 +98,36 @@ export default function CameraForm({ onSuccess }: { onSuccess?: () => void }) {
                         onChange={handleChange}
                         placeholder="rtsp://..."
                         required
-                        className="w-full px-4 py-2 rounded-lg bg-black/40 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
+                        className="w-full px-4 py-2 rounded-2xl bg-black/40 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
                 <div>
                     <label className="block text-sm text-gray-400 mb-1">
-                        Client ID
+                        ID del cliente
                     </label>
                     <input
                         type="text"
                         name="client_id"
                         value={formData.client_id}
                         onChange={handleChange}
-                        placeholder="Enter client ID"
+                        placeholder="Ingresa el ID del cliente"
                         required
-                        className="w-full px-4 py-2 rounded-lg bg-black/40 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
+                        className="w-full px-4 py-2 rounded-2xl bg-black/40 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold py-2 rounded-lg transition"
+                    className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold py-2 rounded-2xl transition"
                 >
-                    {loading ? 'Adding Device...' : 'Add Device'}
+                    {loading ? 'Agregando...' : 'Agregar cámara'}
                 </button>
 
                 {message && (
                     <p className={`text-sm font-medium ${
-                        message.includes('successfully') ? 'text-green-400' : 'text-red-400'
+                        message.includes('correctamente') ? 'text-green-400' : 'text-red-400'
                     }`}>
                         {message}
                     </p>

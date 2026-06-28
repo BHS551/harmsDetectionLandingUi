@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
             const items = data.items ? data.items.sort((a:any, b:any) => b.id.localeCompare(a.id)) : [];
             setDetections(items);
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to fetch detections';
+            const message = error instanceof Error ? error.message : 'No se pudieron cargar las detecciones';
             setDetectionsError(message);
             console.error('Failed to fetch detections:', error);
         } finally {
@@ -57,22 +57,26 @@ const Dashboard: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto">
             {detectionsError && (
-                <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                    Detections unavailable: {detectionsError}
+                <div className="mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                    No se pudieron cargar las detecciones: {detectionsError}
                 </div>
             )}
 
             {loadingDetectionInfo ? (
-                <div className="text-center text-gray-400">Loading...</div>
+                <div className="text-center text-gray-400 py-8">Cargando...</div>
+            ) : detections.length === 0 ? (
+                <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-12 text-center text-gray-400">
+                    Aún no hay detecciones registradas.
+                </div>
             ) : (
-                <div className="overflow-x-auto rounded-lg border border-slate-700">
+                <div className="overflow-x-auto rounded-3xl border border-white/10">
                     <table className="w-full">
-                        <thead className="bg-slate-700 text-white">
+                        <thead className="bg-white/5 text-white">
                             <tr>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Detection</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Camera Name</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">Date</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold">accuracy</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Detección</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Cámara</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Fecha</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold">Similitud</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -81,18 +85,18 @@ const Dashboard: React.FC = () => {
                                 const detectionImage = detection.image_url ?? null;
 
                                 return (
-                                    <tr key={detection.id} className="border-t border-slate-700 hover:bg-slate-700/50 transition">
+                                    <tr key={detection.id} className="border-t border-white/10 hover:bg-white/5 transition">
                                         <td className="px-6 py-4">
                                             {detectionImage ? (
                                                 <img
                                                     src={detectionImage}
-                                                    alt="Detection"
+                                                    alt="Detección"
                                                     className="h-12 rounded cursor-pointer hover:opacity-80 transition"
                                                     onClick={() => setSelectedImage(detectionImage)}
                                                 />
                                             ) : (
-                                                <div className="flex h-12 w-20 items-center justify-center rounded bg-slate-800 text-xs text-gray-400">
-                                                    No image
+                                                <div className="flex h-12 w-20 items-center justify-center rounded bg-white/5 text-xs text-gray-400">
+                                                    Sin imagen
                                                 </div>
                                             )}
                                         </td>
@@ -115,14 +119,14 @@ const Dashboard: React.FC = () => {
                     <div className="relative max-w-4xl max-h-screen" onClick={(e) => e.stopPropagation()}>
                         <img
                             src={selectedImage}
-                            alt="Maximized Detection"
+                            alt="Detección ampliada"
                             className="max-w-full max-h-screen object-contain rounded-lg"
                         />
                         <button
                             onClick={() => setSelectedImage(null)}
                             className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
                         >
-                            Close
+                            Cerrar
                         </button>
                     </div>
                 </div>

@@ -13,7 +13,7 @@ export default function CamerasPage() {
     <>
       <Head>
         <title>SkyEye - Cameras</title>
-        <meta name="description" content="Manage and monitor your camera devices." />
+        <meta name="description" content="Administra y monitorea tus cámaras." />
       </Head>
       <ConsoleProtectedPage
         title="Cameras"
@@ -26,7 +26,7 @@ export default function CamerasPage() {
               onClick={() => setShowForm((v) => !v)}
               className="rounded-full border border-blue-500 bg-blue-500/10 px-5 py-2 text-sm font-semibold text-blue-300 hover:bg-blue-500/20 transition"
             >
-              {showForm ? "Cancelar" : "+ Add Camera"}
+              {showForm ? "Cancelar" : "+ Agregar cámara"}
             </button>
           </div>
 
