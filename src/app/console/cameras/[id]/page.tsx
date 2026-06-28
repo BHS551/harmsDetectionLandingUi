@@ -73,12 +73,6 @@ export default function DeviceDetailPage() {
 
     const handleToggleMonitoring = async () => {
         if (!device) return;
-
-        if (!isAdmin) {
-            setSwitchMessage("Solo un administrador puede iniciar o detener el monitoreo.");
-            return;
-        }
-
         setSwitchLoading(true);
         setSwitchMessage(null);
 
@@ -90,13 +84,16 @@ export default function DeviceDetailPage() {
             const deviceData = JSON.parse(device.raw) as DeviceRaw;
 
             if (!monitoring) {
-                // Verifica el plan antes de encender Heimdall.
-                if (!hasActivePlan) {
-                    throw new Error("Necesitas un plan activo para encender el monitoreo. Ve a 'Planes y suscripción'.");
-                }
-                const activeOthers = getMonitoredCameraIds().filter((cid) => cid !== device.id).length;
-                if (activeOthers >= maxCameras) {
-                    throw new Error(`Alcanzaste el límite de tu plan (${maxCameras} cámaras monitoreadas). Apaga otra cámara o mejora tu plan.`);
+                // Los administradores pueden encender Heimdall sin plan activo (override).
+                // Los demás usuarios necesitan un plan activo y cupo disponible.
+                if (!isAdmin) {
+                    if (!hasActivePlan) {
+                        throw new Error("Necesitas un plan activo para encender el monitoreo. Ve a 'Planes y suscripción'.");
+                    }
+                    const activeOthers = getMonitoredCameraIds().filter((cid) => cid !== device.id).length;
+                    if (activeOthers >= maxCameras) {
+                        throw new Error(`Alcanzaste el límite de tu plan (${maxCameras} cámaras monitoreadas). Apaga otra cámara o mejora tu plan.`);
+                    }
                 }
 
                 const response = await fetch('/api/heimdal-manager', {
@@ -182,7 +179,7 @@ export default function DeviceDetailPage() {
                             </div>
                         </div>
 
-                        {!checkingAdmin && isAdmin && !planLoading && !hasActivePlan && (
+                        {!checkingAdmin && !isAdmin && !planLoading && !hasActivePlan && (
                             <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
                                 Necesitas un plan activo para encender el monitoreo.{" "}
                                 <Link href="/console/billing" className="font-semibold underline hover:text-amber-100">
@@ -200,17 +197,15 @@ export default function DeviceDetailPage() {
                             </div>
                             <button
                                 onClick={handleToggleMonitoring}
-                                disabled={switchLoading || checkingAdmin || planLoading || !isAdmin || (!monitoring && !hasActivePlan)}
+                                disabled={switchLoading || checkingAdmin || planLoading || (!isAdmin && !monitoring && !hasActivePlan)}
                                 title={
-                                    !isAdmin
-                                        ? "Solo un administrador puede cambiar el monitoreo"
-                                        : !monitoring && !hasActivePlan
-                                          ? "Necesitas un plan activo"
-                                          : undefined
+                                    !isAdmin && !monitoring && !hasActivePlan
+                                        ? "Necesitas un plan activo"
+                                        : undefined
                                 }
                                 className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${
                                     monitoring ? "bg-blue-500" : "bg-white/15"
-                                } ${switchLoading || checkingAdmin || planLoading || !isAdmin || (!monitoring && !hasActivePlan) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                                } ${switchLoading || checkingAdmin || planLoading || (!isAdmin && !monitoring && !hasActivePlan) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                             >
                                 <span
                                     className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300 ${
@@ -219,12 +214,6 @@ export default function DeviceDetailPage() {
                                 />
                             </button>
                         </div>
-
-                        {!checkingAdmin && !isAdmin && (
-                            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-                                Necesitas permisos de administrador para iniciar o detener el monitoreo de las cámaras.
-                            </div>
-                        )}
 
                         {switchMessage && (
                             <p className={`text-sm font-medium ${
