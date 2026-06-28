@@ -31,10 +31,12 @@ export async function POST(req: NextRequest) {
 
   let uid: string;
   let email: string | undefined;
+  let isAdmin = false;
   try {
     const decoded = await adminAuth.verifyIdToken(idToken);
     uid = decoded.uid;
     email = decoded.email;
+    isAdmin = decoded.role === "admin";
   } catch (err) {
     console.error("[stripe/checkout] verifyIdToken falló:", {
       message: err instanceof Error ? err.message : String(err),
@@ -48,6 +50,15 @@ export async function POST(req: NextRequest) {
   const plan = getPlan(body?.planId);
   if (!plan) {
     return NextResponse.json({ error: "Plan no válido." }, { status: 400 });
+  }
+
+  // Planes exclusivos para administradores: se valida también en el servidor
+  // para que un usuario no pueda contratarlos llamando a la API directamente.
+  if (plan.adminOnly && !isAdmin) {
+    return NextResponse.json(
+      { error: "Este plan es exclusivo para administradores." },
+      { status: 403 }
+    );
   }
 
   const stripe = new Stripe(secretKey);
