@@ -35,7 +35,12 @@ export async function POST(req: NextRequest) {
     const decoded = await adminAuth.verifyIdToken(idToken);
     uid = decoded.uid;
     email = decoded.email;
-  } catch {
+  } catch (err) {
+    console.error("[stripe/checkout] verifyIdToken falló:", {
+      message: err instanceof Error ? err.message : String(err),
+      code: (err as { code?: string })?.code,
+      adminProjectId: process.env.FIREBASE_PROJECT_ID,
+    });
     return NextResponse.json({ error: "Sesión inválida." }, { status: 401 });
   }
 
