@@ -24,6 +24,11 @@
 .DS_Store
 *.pem
 
+# firebase service account keys (never commit)
+serviceAccountKey*.json
+*serviceaccount*.json
+firebase-adminsdk*.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -33,11 +38,6 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
-
-# firebase service account keys (never commit)
-serviceAccountKey*.json
-*serviceaccount*.json
-firebase-adminsdk*.json
 
 # vercel
 .vercel
