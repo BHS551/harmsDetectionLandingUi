@@ -4,14 +4,19 @@ import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { usePlan } from "@/lib/usePlan";
+import { useIsAdmin } from "@/lib/useAdmin";
 import { PLANS, formatPrice, getPlan } from "@/lib/plans";
 import { ConsoleProtectedPage } from "../login";
 
 function BillingContent() {
   const searchParams = useSearchParams();
   const { subscription, loading, hasActivePlan } = usePlan();
+  const { isAdmin } = useIsAdmin();
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Los planes exclusivos para administradores solo se muestran a admins.
+  const visiblePlans = PLANS.filter((plan) => !plan.adminOnly || isAdmin);
 
   const justSucceeded = searchParams.get("success") === "1";
   const canceled = searchParams.get("canceled") === "1";
@@ -92,14 +97,21 @@ function BillingContent() {
       <div>
         <h2 className="text-lg font-semibold text-white">Planes disponibles</h2>
         <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {PLANS.map((plan) => {
+          {visiblePlans.map((plan) => {
             const isCurrent = hasActivePlan && subscription?.plan === plan.id;
             return (
               <div
                 key={plan.id}
                 className="flex flex-col rounded-3xl border border-white/10 bg-white/5 p-6"
               >
-                <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
+                  {plan.adminOnly && (
+                    <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 text-xs text-blue-300">
+                      Solo administradores
+                    </span>
+                  )}
+                </div>
                 <p className="mt-2 text-3xl font-bold text-white">
                   {formatPrice(plan)}
                 </p>

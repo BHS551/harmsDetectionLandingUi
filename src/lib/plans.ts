@@ -18,6 +18,8 @@ export type Plan = {
   currency: string;
   /** Bullets para la tarjeta de pricing. */
   features: string[];
+  /** Si es true, solo los administradores pueden ver y contratar el plan. */
+  adminOnly?: boolean;
 };
 
 export const PLANS: Plan[] = [
@@ -32,6 +34,19 @@ export const PLANS: Plan[] = [
       "Detección con IA en tiempo real",
       "Alertas con evidencia",
       "Panel de detecciones",
+    ],
+  },
+  {
+    id: "cam1",
+    name: "1 cámara",
+    maxCameras: 1,
+    priceCents: 100,
+    currency: "usd",
+    adminOnly: true,
+    features: [
+      "1 cámara monitoreada",
+      "Detección con IA en tiempo real",
+      "Plan exclusivo para administradores",
     ],
   },
 ];
