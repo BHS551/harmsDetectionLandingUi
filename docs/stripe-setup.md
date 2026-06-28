@@ -1,9 +1,39 @@
-# Configuración de pagos (Stripe) y planes
+# Configuración de pagos (PayU / Stripe) y planes
 
-SkyEye cobra los planes como **suscripción mensual** vía Stripe Checkout. El
-estado del plan se guarda en Firestore (`subscriptions/{uid}`) y se sincroniza
-mediante un webhook. Antes de encender Heimdall en una cámara, la app verifica
-que el usuario tenga un plan activo y cupo disponible.
+SkyEye cobra los planes y guarda el estado en Firestore (`subscriptions/{uid}`),
+sincronizado por la confirmación de la pasarela. Antes de encender Heimdall en
+una cámara, la app verifica que el usuario tenga un plan activo y cupo disponible.
+
+## Pasarela: PayU (por defecto) o Stripe
+
+El proveedor se elige con la variable `PAYMENT_PROVIDER`:
+
+- **Sin configurar / `payu`** → se usa **PayU** (WebCheckout). Confirmación en
+  `/api/payu/confirmation`.
+- **`stripe`** → se usa **Stripe** Checkout. Webhook en `/api/stripe/webhook`.
+
+El endpoint `/api/checkout` es único para ambos: decide la pasarela según
+`PAYMENT_PROVIDER` y devuelve los datos que el frontend necesita (URL de Stripe
+o formulario de PayU).
+
+### PayU (WebCheckout)
+
+1. En el panel de PayU (Configuración → Configuración técnica) obtén
+   `PAYU_MERCHANT_ID`, `PAYU_ACCOUNT_ID` y `PAYU_API_KEY`.
+2. Completa esas variables en `.env.local` (ver `.env.example`). Deja
+   `PAYU_TEST=1` y la `PAYU_CHECKOUT_URL` de sandbox para pruebas.
+3. PayU notifica el resultado a `<tu-dominio>/api/payu/confirmation`
+   (configurable también en el panel). La firma se valida con la API Key y, si
+   el estado es aprobado (`state_pol=4`), se activa la suscripción.
+4. El `uid` y el plan viajan en `extra1`/`extra2` y vuelven en la confirmación.
+
+> Nota: la confirmación de PayU es server-to-server y puede tardar; al volver del
+> pago, la app muestra "estamos confirmando tu pago" y el plan se activa cuando
+> llega la confirmación aprobada.
+
+---
+
+## Stripe (solo si `PAYMENT_PROVIDER=stripe`)
 
 ## 1. Variables de entorno
 

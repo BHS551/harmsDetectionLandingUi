@@ -20,8 +20,25 @@ function BillingContent() {
 
   const justSucceeded = searchParams.get("success") === "1";
   const canceled = searchParams.get("canceled") === "1";
+  const payuReturn = searchParams.get("provider") === "payu";
 
   const currentPlan = getPlan(subscription?.plan);
+
+  // PayU WebCheckout requiere enviar un formulario por POST a la pasarela.
+  const submitPayuForm = (action: string, fields: Record<string, string>) => {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = action;
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  };
 
   const handleSubscribe = async (planId: string) => {
     setError(null);
@@ -32,7 +49,7 @@ function BillingContent() {
       if (!user) throw new Error("Inicia sesión para suscribirte.");
 
       const token = await user.getIdToken();
-      const response = await fetch("/api/stripe/checkout", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,11 +59,21 @@ function BillingContent() {
       });
 
       const data = await response.json();
-      if (!response.ok || !data.url) {
+      if (!response.ok) {
         throw new Error(data.error || "No se pudo iniciar el pago.");
       }
 
-      window.location.href = data.url;
+      if (data.provider === "payu" && data.action && data.fields) {
+        submitPayuForm(data.action, data.fields);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      throw new Error("No se pudo iniciar el pago.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ocurrió un error.");
       setCheckoutLoading(null);
@@ -58,6 +85,12 @@ function BillingContent() {
       {justSucceeded && (
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
           ¡Pago completado! Tu plan se activará en unos segundos.
+        </div>
+      )}
+      {payuReturn && (
+        <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
+          Estamos confirmando tu pago con PayU. Tu plan se activará en cuanto se
+          apruebe la transacción.
         </div>
       )}
       {canceled && (
