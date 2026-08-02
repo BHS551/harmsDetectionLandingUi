@@ -326,8 +326,29 @@ export function ConsoleLogin() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1f1f1f_0%,#050505_55%)] px-4 py-12 text-white">
-      <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+    <main className="min-h-screen scroll-smooth bg-[radial-gradient(circle_at_top,#1f1f1f_0%,#050505_55%)] px-4 py-6 text-white md:py-12">
+      <div className="mx-auto mb-6 flex max-w-6xl justify-end">
+        <a
+          href="#login-card"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-blue-500/60 hover:text-blue-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="h-4 w-4"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Iniciar sesión
+        </a>
+      </div>
+      <div className="mx-auto grid min-h-[calc(100vh-10rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="space-y-6">
           <div className="inline-flex rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
             Acceso al panel operativo
@@ -358,7 +379,10 @@ export function ConsoleLogin() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-white/6 p-8 shadow-2xl shadow-black/40 backdrop-blur">
+        <section
+          id="login-card"
+          className="scroll-mt-6 rounded-3xl border border-white/10 bg-white/6 p-8 shadow-2xl shadow-black/40 backdrop-blur"
+        >
           <div className="mb-6">
             <p className="text-sm uppercase tracking-[0.3em] text-blue-400">
               Login
