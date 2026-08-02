@@ -24,6 +24,21 @@ type Device = {
 // Palabras de detección iniciales disponibles para toda cámara.
 const DEFAULT_DETECTION_WORDS = ["caidas", "robos", "violencia", "persona"];
 
+// Minúsculas y sin acentos, para que "Caídas" no cree un duplicado de "caidas".
+const normalizeWord = (word: string) =>
+    word.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+// Sanea listas venidas de localStorage: solo strings, normalizadas, sin duplicados.
+const sanitizeWords = (value: unknown): string[] => {
+    if (!Array.isArray(value)) return [];
+    return [...new Set(
+        value
+            .filter((w): w is string => typeof w === "string")
+            .map(normalizeWord)
+            .filter(Boolean),
+    )];
+};
+
 export default function DeviceDetailPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -47,12 +62,13 @@ export default function DeviceDetailPage() {
             const savedWords = localStorage.getItem(`detection_words_${id}`);
             if (savedWords) {
                 try {
-                    const parsed = JSON.parse(savedWords) as { available?: string[]; selected?: string[] };
-                    if (Array.isArray(parsed.available) && parsed.available.length > 0) {
-                        setAvailableWords(parsed.available);
-                    }
-                    if (Array.isArray(parsed.selected)) {
-                        setSelectedWords(parsed.selected);
+                    const parsed = JSON.parse(savedWords) as { available?: unknown; selected?: unknown };
+                    const available = sanitizeWords(parsed.available);
+                    // Solo palabras visibles pueden estar seleccionadas.
+                    const selected = sanitizeWords(parsed.selected).filter((w) => available.includes(w));
+                    if (available.length > 0) {
+                        setAvailableWords(available);
+                        setSelectedWords(selected);
                     }
                 } catch {
                     // Valor corrupto en localStorage: se mantienen los defaults.
@@ -77,7 +93,7 @@ export default function DeviceDetailPage() {
     };
 
     const addWord = () => {
-        const word = newWord.trim().toLowerCase();
+        const word = normalizeWord(newWord);
         if (!word) return;
         setNewWord("");
         if (availableWords.includes(word)) {
@@ -154,6 +170,10 @@ export default function DeviceDetailPage() {
 
                 if (selectedWords.length === 0) {
                     throw new Error("Selecciona al menos una palabra de detección antes de encender el monitoreo.");
+                }
+
+                if (!deviceData.rtsp_path) {
+                    throw new Error("Esta cámara no tiene ruta RTSP configurada; el monitoreo no puede iniciarse sin ella.");
                 }
 
                 const response = await fetch('/api/heimdal-manager', {
