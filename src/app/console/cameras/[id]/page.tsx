@@ -21,6 +21,9 @@ type Device = {
     created_at: string;
 };
 
+// Palabras de detección iniciales disponibles para toda cámara.
+const DEFAULT_DETECTION_WORDS = ["caidas", "robos", "violencia", "persona"];
+
 export default function DeviceDetailPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -32,13 +35,66 @@ export default function DeviceDetailPage() {
     const [monitoring, setMonitoring] = useState(false);
     const [switchLoading, setSwitchLoading] = useState(false);
     const [switchMessage, setSwitchMessage] = useState<string | null>(null);
+    const [availableWords, setAvailableWords] = useState<string[]>(DEFAULT_DETECTION_WORDS);
+    const [selectedWords, setSelectedWords] = useState<string[]>(DEFAULT_DETECTION_WORDS);
+    const [newWord, setNewWord] = useState("");
 
     useEffect(() => {
         if (id) {
             const saved = localStorage.getItem(`monitoring_${id}`);
             if (saved === "true") setMonitoring(true);
+
+            const savedWords = localStorage.getItem(`detection_words_${id}`);
+            if (savedWords) {
+                try {
+                    const parsed = JSON.parse(savedWords) as { available?: string[]; selected?: string[] };
+                    if (Array.isArray(parsed.available) && parsed.available.length > 0) {
+                        setAvailableWords(parsed.available);
+                    }
+                    if (Array.isArray(parsed.selected)) {
+                        setSelectedWords(parsed.selected);
+                    }
+                } catch {
+                    // Valor corrupto en localStorage: se mantienen los defaults.
+                }
+            }
         }
     }, [id]);
+
+    const persistWords = (available: string[], selected: string[]) => {
+        setAvailableWords(available);
+        setSelectedWords(selected);
+        if (id) {
+            localStorage.setItem(`detection_words_${id}`, JSON.stringify({ available, selected }));
+        }
+    };
+
+    const toggleWord = (word: string) => {
+        const selected = selectedWords.includes(word)
+            ? selectedWords.filter((w) => w !== word)
+            : [...selectedWords, word];
+        persistWords(availableWords, selected);
+    };
+
+    const addWord = () => {
+        const word = newWord.trim().toLowerCase();
+        if (!word) return;
+        setNewWord("");
+        if (availableWords.includes(word)) {
+            if (!selectedWords.includes(word)) {
+                persistWords(availableWords, [...selectedWords, word]);
+            }
+            return;
+        }
+        persistWords([...availableWords, word], [...selectedWords, word]);
+    };
+
+    const removeWord = (word: string) => {
+        persistWords(
+            availableWords.filter((w) => w !== word),
+            selectedWords.filter((w) => w !== word),
+        );
+    };
 
     useEffect(() => {
         const fetchDevice = async () => {
@@ -96,6 +152,10 @@ export default function DeviceDetailPage() {
                     }
                 }
 
+                if (selectedWords.length === 0) {
+                    throw new Error("Selecciona al menos una palabra de detección antes de encender el monitoreo.");
+                }
+
                 const response = await fetch('/api/heimdal-manager', {
                     method: 'POST',
                     headers: {
@@ -109,7 +169,7 @@ export default function DeviceDetailPage() {
                             instance_id: device.id,
                             client_id: deviceData.client_id,
                             camera_name: deviceData.name,
-                            detection_blacklist: ["knife"],
+                            detection_blacklist: selectedWords,
                             rtsp_path: deviceData.rtsp_path,
                             owner_uid: user.uid,
                         }
@@ -211,6 +271,71 @@ export default function DeviceDetailPage() {
                                 </Link>
                             </div>
                         )}
+
+                        <div className="border-t border-white/10 pt-4 space-y-3">
+                            <div>
+                                <p className="text-white font-semibold">Palabras de detección</p>
+                                <p className="text-gray-400 text-sm">
+                                    Selecciona qué debe detectar Heimdall en esta cámara. Los cambios se aplican al (re)iniciar el monitoreo.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {availableWords.map((word) => {
+                                    const selected = selectedWords.includes(word);
+                                    const isCustom = !DEFAULT_DETECTION_WORDS.includes(word);
+                                    return (
+                                        <span
+                                            key={word}
+                                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors ${
+                                                selected
+                                                    ? "border-blue-400/60 bg-blue-500/20 text-blue-100"
+                                                    : "border-white/15 bg-white/5 text-gray-400"
+                                            }`}
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleWord(word)}
+                                                aria-pressed={selected}
+                                                className="cursor-pointer"
+                                            >
+                                                {word}
+                                            </button>
+                                            {isCustom && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeWord(word)}
+                                                    aria-label={`Eliminar ${word}`}
+                                                    className="cursor-pointer text-gray-400 hover:text-red-300"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    value={newWord}
+                                    onChange={(e) => setNewWord(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            addWord();
+                                        }
+                                    }}
+                                    placeholder="Agregar palabra..."
+                                    className="flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={addWord}
+                                    className="rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition"
+                                >
+                                    Agregar
+                                </button>
+                            </div>
+                        </div>
 
                         <div className="flex items-center justify-between border-t border-white/10 pt-4">
                             <div>
