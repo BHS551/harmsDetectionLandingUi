@@ -103,6 +103,7 @@ export default function DeviceDetailPage() {
                         Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
+                        action: "start",
                         taskId: device.id,
                         context: {
                             instance_id: device.id,
@@ -125,6 +126,26 @@ export default function DeviceDetailPage() {
                 localStorage.setItem(`monitoring_${device.id}`, "true");
                 setSwitchMessage("Monitoreo iniciado correctamente");
             } else {
+                // Apagar pasa por el mismo endpoint que encender: HeimdalManager
+                // termina las instancias EC2 etiquetadas con este taskId.
+                const response = await fetch('/api/heimdal-manager', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        action: "stop",
+                        taskId: device.id,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    let detail = errorBody;
+                    try { detail = JSON.parse(errorBody)?.message ?? JSON.parse(errorBody)?.error ?? errorBody; } catch {}
+                    throw new Error(`Error ${response.status}: ${detail}`);
+                }
                 setMonitoring(false);
                 localStorage.removeItem(`monitoring_${device.id}`);
                 setSwitchMessage("Monitoreo detenido");
