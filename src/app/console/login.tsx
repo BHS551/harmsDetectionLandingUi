@@ -129,7 +129,20 @@ export function ConsoleHeader({
 
           {userLabel ? (
             <div className="flex items-center gap-3 text-sm text-gray-300">
-              <span>Sesión: {userLabel}</span>
+              <Link
+                href="/console/account"
+                title="Mi cuenta"
+                className={`flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-4 transition ${
+                  pathname === "/console/account"
+                    ? "border-blue-500 bg-blue-500/10 text-blue-300"
+                    : "border-white/10 bg-white/5 hover:border-blue-500/60 hover:text-blue-300"
+                }`}
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 text-xs font-bold text-black">
+                  {userLabel.charAt(0).toUpperCase()}
+                </span>
+                <span className="max-w-[160px] truncate">{userLabel}</span>
+              </Link>
               <button
                 type="button"
                 onClick={handleLogout}
