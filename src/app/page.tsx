@@ -1,21 +1,48 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
+
+// Lambda notifyAdmin: publica en SNS y le llega por correo al administrador.
+const NOTIFY_ADMIN_URL = "https://uuzrdi5pxc.execute-api.us-east-1.amazonaws.com/";
 
 export default function Home() {
   const homeRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
+  const [contactStatus, setContactStatus] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
 
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("¡Gracias por contactarnos! Nos pondremos en contacto contigo muy pronto.");
-    e.currentTarget.reset();
+    // Capturar el form antes del await: React recicla el evento.
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    setContactStatus("sending");
+
+    try {
+      const response = await fetch(NOTIFY_ADMIN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "contact",
+          name: formData.get("name"),
+          email: formData.get("email"),
+          message: formData.get("message"),
+          website: formData.get("website"), // honeypot anti-spam
+        }),
+      });
+      if (!response.ok) throw new Error("send failed");
+      setContactStatus("sent");
+      form.reset();
+    } catch {
+      setContactStatus("error");
+    }
   };
 
   const steps = [
@@ -306,12 +333,32 @@ export default function Home() {
                   className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-blue-500"
                 />
               </div>
+              {/* Honeypot anti-spam: invisible para humanos, los bots lo rellenan. */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="hidden"
+              />
               <button
                 type="submit"
-                className="w-full rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-black transition hover:bg-blue-400"
+                disabled={contactStatus === "sending"}
+                className="w-full rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-black transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Enviar mensaje
+                {contactStatus === "sending" ? "Enviando..." : "Enviar mensaje"}
               </button>
+              {contactStatus === "sent" && (
+                <p className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                  ¡Gracias por contactarnos! Nos pondremos en contacto contigo muy pronto.
+                </p>
+              )}
+              {contactStatus === "error" && (
+                <p className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  No se pudo enviar el mensaje. Inténtalo de nuevo en unos minutos.
+                </p>
+              )}
             </form>
           </div>
         </section>

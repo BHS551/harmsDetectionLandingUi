@@ -8,12 +8,19 @@ import { useIsAdmin } from "@/lib/useAdmin";
 import { PLANS, formatPrice, getPlan } from "@/lib/plans";
 import { ConsoleProtectedPage } from "../login";
 
+// Modo temporal sin pasarela de pago: la solicitud del plan se envía por
+// correo al administrador (Lambda notifyAdmin -> SNS) y él lo activa a mano.
+// Poner en false para volver al checkout con PayU/Stripe.
+const MANUAL_ACTIVATION_MODE: boolean = true;
+const NOTIFY_ADMIN_URL = "https://uuzrdi5pxc.execute-api.us-east-1.amazonaws.com/";
+
 function BillingContent() {
   const searchParams = useSearchParams();
   const { subscription, loading, hasActivePlan } = usePlan();
   const { isAdmin } = useIsAdmin();
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [requestedPlan, setRequestedPlan] = useState<string | null>(null);
 
   // Los planes exclusivos para administradores solo se muestran a admins.
   const visiblePlans = PLANS.filter((plan) => !plan.adminOnly || isAdmin);
@@ -49,6 +56,25 @@ function BillingContent() {
       if (!user) throw new Error("Inicia sesión para suscribirte.");
 
       const token = await user.getIdToken();
+
+      if (MANUAL_ACTIVATION_MODE) {
+        const response = await fetch(NOTIFY_ADMIN_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ type: "plan_request", planId }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || data.error || "No se pudo enviar la solicitud.");
+        }
+        setRequestedPlan(planId);
+        setCheckoutLoading(null);
+        return;
+      }
+
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
@@ -82,6 +108,13 @@ function BillingContent() {
 
   return (
     <div className="space-y-8">
+      {requestedPlan && (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          Se ha contactado al administrador para activar tu plan
+          {getPlan(requestedPlan) ? ` "${getPlan(requestedPlan)!.name}"` : ""}. Te
+          avisaremos en cuanto esté activo — no se realizó ningún cobro.
+        </div>
+      )}
       {justSucceeded && (
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
           ¡Pago completado! Tu plan se activará en unos segundos.
@@ -158,14 +191,22 @@ function BillingContent() {
                 </ul>
                 <button
                   onClick={() => handleSubscribe(plan.id)}
-                  disabled={isCurrent || checkoutLoading !== null}
+                  disabled={
+                    isCurrent ||
+                    checkoutLoading !== null ||
+                    requestedPlan === plan.id
+                  }
                   className="mt-8 w-full rounded-2xl bg-blue-500 px-4 py-3 font-semibold text-black transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isCurrent
                     ? "Plan actual"
-                    : checkoutLoading === plan.id
-                      ? "Redirigiendo..."
-                      : "Suscribirme"}
+                    : requestedPlan === plan.id
+                      ? "Solicitud enviada"
+                      : checkoutLoading === plan.id
+                        ? MANUAL_ACTIVATION_MODE
+                          ? "Enviando solicitud..."
+                          : "Redirigiendo..."
+                        : "Suscribirme"}
                 </button>
               </div>
             );
