@@ -13,6 +13,7 @@ import {
   User,
 } from "firebase/auth";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
+import { useIsAdmin } from "@/lib/useAdmin";
 
 const navigationItems = [
   { href: "/console", label: "Inicio" },
@@ -68,7 +69,12 @@ export function ConsoleHeader({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { isAdmin } = useIsAdmin();
   const [userLabel, setUserLabel] = useState("");
+
+  const navItems = isAdmin
+    ? [...navigationItems, { href: "/console/admin", label: "Admin" }]
+    : navigationItems;
 
   useEffect(() => {
     if (!auth) {
@@ -106,7 +112,7 @@ export function ConsoleHeader({
         <div className="flex flex-col gap-3 md:items-end">
           <nav>
             <ul className="flex flex-wrap gap-3 text-sm text-gray-300">
-              {navigationItems.map((item) => {
+              {navItems.map((item) => {
                 const isActive = pathname === item.href;
 
                 return (

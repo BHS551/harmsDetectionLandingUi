@@ -2,63 +2,61 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
-import { auth, db } from "./firebase";
+import { auth } from "./firebase";
 
 export type Subscription = {
+  uid?: string;
+  email?: string;
   plan: string;
   maxCameras: number;
   status: string;
-  stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
-  currentPeriodEnd?: number;
+  activatedBy?: string;
+  updatedAt?: string;
 };
 
+// Lambda subscriptions (DynamoDB). Las activa el administrador desde
+// /console/admin; el cliente solo lee la suya.
+export const SUBSCRIPTIONS_URL =
+  "https://8gq52tgisd.execute-api.us-east-1.amazonaws.com/";
+
 /**
- * Lee en vivo la suscripción del usuario desde Firestore (subscriptions/{uid}).
- * El documento lo escribe el webhook de Stripe con el Admin SDK; el cliente
- * solo lo lee. Al actualizarse en Stripe, el panel reacciona sin recargar.
+ * Lee la suscripción del usuario autenticado desde el backend (DynamoDB via
+ * Lambda). Antes vivía en Firestore, pero la base de datos nunca existió en el
+ * proyecto Firebase; este endpoint es ahora la fuente de verdad.
  */
 export function usePlan() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth || !db) {
+    if (!auth) {
       setLoading(false);
       return;
     }
 
-    let unsubDoc: (() => void) | null = null;
-
-    const unsubAuth = onAuthStateChanged(auth, (user) => {
-      unsubDoc?.();
-      unsubDoc = null;
-
-      if (!user || !db) {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
         setSubscription(null);
         setLoading(false);
         return;
       }
 
       setLoading(true);
-      unsubDoc = onSnapshot(
-        doc(db, "subscriptions", user.uid),
-        (snap) => {
-          setSubscription(snap.exists() ? (snap.data() as Subscription) : null);
-          setLoading(false);
-        },
-        () => {
-          setSubscription(null);
-          setLoading(false);
-        }
-      );
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch(SUBSCRIPTIONS_URL, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        setSubscription(response.ok ? (data.subscription ?? null) : null);
+      } catch {
+        setSubscription(null);
+      } finally {
+        setLoading(false);
+      }
     });
 
-    return () => {
-      unsubDoc?.();
-      unsubAuth();
-    };
+    return () => unsubscribe();
   }, []);
 
   const hasActivePlan = subscription?.status === "active";
