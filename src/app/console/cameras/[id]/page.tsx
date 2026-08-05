@@ -190,7 +190,8 @@ export default function DeviceDetailPage() {
                             client_id: deviceData.client_id,
                             camera_name: deviceData.name,
                             detection_blacklist: selectedWords,
-                            rtsp_path: deviceData.rtsp_path,
+                            // rtsp_path ya NO viaja por el navegador: heimdalManager
+                            // lee la URL real desde Secrets Manager por dispositivo.
                             owner_uid: user.uid,
                         }
                     }),
