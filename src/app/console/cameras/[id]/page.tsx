@@ -24,6 +24,10 @@ type Device = {
 // Palabras de detección iniciales disponibles para toda cámara.
 const DEFAULT_DETECTION_WORDS = ["caidas", "robos", "violencia", "persona"];
 
+// Endpoint de estado del worker (heartbeat): muestra si la cámara está siendo
+// procesada de verdad, en vez de confiar solo en el switch/localStorage.
+const WORKER_EVENTS_URL = "https://p4nojr0ec5.execute-api.us-east-1.amazonaws.com/";
+
 // Minúsculas y sin acentos, para que "Caídas" no cree un duplicado de "caidas".
 const normalizeWord = (word: string) =>
     word.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -53,6 +57,8 @@ export default function DeviceDetailPage() {
     const [availableWords, setAvailableWords] = useState<string[]>(DEFAULT_DETECTION_WORDS);
     const [selectedWords, setSelectedWords] = useState<string[]>(DEFAULT_DETECTION_WORDS);
     const [newWord, setNewWord] = useState("");
+    // null = desconocido/aún sin consultar; true/false = worker en línea o sin señal.
+    const [workerOnline, setWorkerOnline] = useState<boolean | null>(null);
 
     useEffect(() => {
         if (id) {
@@ -142,6 +148,36 @@ export default function DeviceDetailPage() {
 
         fetchDevice();
     }, [id]);
+
+    // Estado real del worker: consulta el heartbeat mientras el monitoreo esté
+    // encendido. Si deja de latir >90s, workerEvents lo reporta como offline.
+    useEffect(() => {
+        if (!monitoring || !id) {
+            setWorkerOnline(null);
+            return;
+        }
+        let cancelled = false;
+        const check = async () => {
+            try {
+                const user = auth?.currentUser;
+                if (!user) return;
+                const token = await user.getIdToken();
+                const res = await fetch(`${WORKER_EVENTS_URL}?device_id=${encodeURIComponent(String(id))}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = await res.json();
+                if (!cancelled) setWorkerOnline(res.ok ? Boolean(data.status?.online) : false);
+            } catch {
+                if (!cancelled) setWorkerOnline(false);
+            }
+        };
+        check();
+        const timer = setInterval(check, 30000);
+        return () => {
+            cancelled = true;
+            clearInterval(timer);
+        };
+    }, [monitoring, id]);
 
     const handleToggleMonitoring = async () => {
         if (!device) return;
@@ -360,7 +396,19 @@ export default function DeviceDetailPage() {
 
                         <div className="flex items-center justify-between border-t border-white/10 pt-4">
                             <div>
-                                <p className="text-white font-semibold">Monitoreo</p>
+                                <p className="text-white font-semibold flex items-center gap-2">
+                                    Monitoreo
+                                    {monitoring && workerOnline !== null && (
+                                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs ${
+                                            workerOnline
+                                                ? "bg-emerald-500/15 text-emerald-300"
+                                                : "bg-amber-500/15 text-amber-300"
+                                        }`}>
+                                            <span className={`h-1.5 w-1.5 rounded-full ${workerOnline ? "bg-emerald-400" : "bg-amber-400"}`} />
+                                            {workerOnline ? "worker en línea" : "sin señal del worker"}
+                                        </span>
+                                    )}
+                                </p>
                                 <p className="text-gray-400 text-sm">
                                     {monitoring ? "Activo — la cámara está siendo monitoreada" : "Inactivo — haz clic para iniciar el monitoreo"}
                                 </p>
