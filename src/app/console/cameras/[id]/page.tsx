@@ -8,6 +8,7 @@ import { useIsAdmin } from "@/lib/useAdmin";
 import { usePlan } from "@/lib/usePlan";
 import { getMonitoredCameraIds } from "@/lib/monitoring";
 import { ConsoleProtectedPage } from "../../login";
+import LiveView from "../live-view";
 
 type DeviceRaw = {
     name?: string;
@@ -319,6 +320,8 @@ export default function DeviceDetailPage() {
                                 <p className="text-white font-semibold">{device.created_at}</p>
                             </div>
                         </div>
+
+                        <LiveView cameraId={device.id} />
 
                         {!checkingAdmin && !isAdmin && !planLoading && !hasActivePlan && (
                             <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
